@@ -55,7 +55,7 @@ def _create_token(type_token: str, time_life: timedelta, sub: str
                       algorithm=settings.ALGORITHM)
 
 
-def create_token_access(sub: str) -> str:
+def create_access_token(sub: str) -> str:
 
     return _create_token(
         type_token='access_token',
