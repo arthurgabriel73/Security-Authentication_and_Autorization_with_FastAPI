@@ -1,9 +1,10 @@
-from typing import List, Optional
+from typing import List
 
 from fastapi import APIRouter, status, Depends, HTTPException, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import JSONResponse
 from pydantic import EmailStr
+from sqlalchemy.exc import IntegrityError
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -14,7 +15,6 @@ from core.deps import get_session, get_current_user
 from core.security import generate_hash_password
 from core.auth import authenticate, create_access_token
 
-
 router = APIRouter()
 
 
@@ -24,8 +24,8 @@ def get_logged(logged_user: UserModel = Depends(get_current_user)):
     return logged_user
 
 
-#POST / SIGN UP
-@router.post('/sing_up', status_code=status.HTTP_201_CREATED, response_model=UserSchemaBase)
+# POST / SIGN UP
+@router.post('/singup', status_code=status.HTTP_201_CREATED, response_model=UserSchemaBase)
 async def post_user(user: UserSchemaCreate, db: AsyncSession = Depends(get_session)):
     new_user: UserModel = UserModel(
         name=user.name,
@@ -35,10 +35,14 @@ async def post_user(user: UserSchemaCreate, db: AsyncSession = Depends(get_sessi
         is_admin=user.is_admin
     )
     async with db as session:
-        session.add(new_user)
-        await session.commit()
+        try:
+            session.add(new_user)
+            await session.commit()
 
-        return new_user
+            return new_user
+        except IntegrityError:
+            raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                                detail='There is an user with this email already.')
 
 
 # GET USERS
@@ -47,12 +51,12 @@ async def get_users(db: AsyncSession = Depends(get_session)):
     async with db as session:
         query = select(UserModel)
         result = await session.execute(query)
-        users = result.scalars().unique().all()
+        users: List[UserSchemaBase] = result.scalars().unique().all()
 
         return users
 
 
-#GET USER with your own articles
+# GET USER with your own articles
 @router.get('/{user_id}', response_model=UserSchemaArticles, status_code=status.HTTP_200_OK)
 async def get_user(user_id: int, db: AsyncSession = Depends(get_session)):
     async with db as session:
@@ -67,7 +71,7 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_session)):
 
 
 # PUT USER
-@router.get('/{user_id}', response_model=UserSchemaBase, status_code=status.HTTP_202_ACCEPTED)
+@router.put('/{user_id}', response_model=UserSchemaBase, status_code=status.HTTP_202_ACCEPTED)
 async def put_user(user_id: int, user: UserSchemaUpdate, db: AsyncSession = Depends(get_session)):
     async with db as session:
         query = select(UserModel).filter(UserModel.id == user_id)
@@ -120,4 +124,4 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSessi
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Invalid access data.')
 
     return JSONResponse(content={"access_token": create_access_token(sub=str(user.id)), "token_type": "bearer"},
-    status_code=status.HTTP_200_OK)
+                        status_code=status.HTTP_200_OK)

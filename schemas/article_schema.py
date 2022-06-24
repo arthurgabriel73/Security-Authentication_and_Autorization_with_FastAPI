@@ -1,12 +1,13 @@
 from pydantic import BaseModel, HttpUrl
+from typing import Optional
 
 
 class ArticleSchema(BaseModel):
-    id: int | None = None
+    id: Optional[int]
     title: str
     description: str
     root_url: HttpUrl
-    user_id: int | None = None
+    user_id: Optional[int]
     # creator = relationship() NÂO TEM
 
 

@@ -20,7 +20,7 @@ router = APIRouter()
 async def post_article(
         article: ArticleSchema,
         logged_user: UserModel = Depends(get_current_user),
-        db: AsyncSession = get_session):
+        db: AsyncSession = Depends(get_session)):
 
     new_article: ArticleModel = ArticleModel(
         title=article.title,
@@ -52,7 +52,7 @@ async def get_article(article_id: int, db: AsyncSession = Depends(get_session)):
     async with db as session:
         query = select(ArticleModel).filter(ArticleModel.id == article_id)
         result = await session.execute(query)
-        article = result.scalars().unique().one_or_none()
+        article: ArticleModel = result.scalars().unique().one_or_none()
 
         if article:
             return article
@@ -106,4 +106,3 @@ async def get_article(
             return Response(status_code=status.HTTP_204_NO_CONTENT)
         else:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Article not found.')
-        

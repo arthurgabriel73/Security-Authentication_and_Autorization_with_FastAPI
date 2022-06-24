@@ -8,7 +8,7 @@ class UserSchemaBase(BaseModel):
     id: int | None = None
     name: str | None = None
     lastname: str | None = None
-    email = EmailStr
+    email: EmailStr
     # password = str NÂO TEM
     is_admin: bool = False
     # articles = relationship() NÂO TEM

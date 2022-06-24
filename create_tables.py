@@ -1,9 +1,11 @@
 from core.configs import settings
 from core.database import engine
 
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 
 async def create_tables() -> None:
-    import models.__all_models
     print('Creating tables on database')
 
     async with engine.begin() as conn:

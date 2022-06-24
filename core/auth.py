@@ -40,7 +40,7 @@ def _create_token(type_token: str, time_life: timedelta, sub: str
                  ) -> str:
     # https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3
     payload = {}
-    mg = timezone('America/Minas_Gerais')
+    mg = timezone('America/Sao_paulo')
     expire = datetime.now(tz=mg) + time_life
 
     payload["type"] = type_token
