@@ -10,6 +10,5 @@ class ArticleSchema(BaseModel):
     user_id: Optional[int]
     # creator = relationship() NÂO TEM
 
-
-class Config:
-    orm_mode = True
+    class Config:
+        orm_mode = True
