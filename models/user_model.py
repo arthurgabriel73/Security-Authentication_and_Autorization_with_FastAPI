@@ -17,6 +17,6 @@ class UserModel(settings.DBBaseModel):
         "ArticleModel",
         cascade="all,delete-orphan",
         back_populates="creator",
-        useList=True,
+        uselist=True,
         lazy="joined"
     )

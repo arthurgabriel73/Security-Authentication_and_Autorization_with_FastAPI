@@ -1,14 +1,13 @@
-from typing import List
-
 from pydantic import BaseSettings
 
 from sqlalchemy.ext.declarative import declarative_base
+my_declarative_base = declarative_base()
 
 
 class Settings(BaseSettings):
     API_V1_STR: str = '/api/v1'
     DB_URL: str = 'postgresql+asyncpg://postgres:c4c232a4@localhost:5432/college'
-    DBBaseModel = declarative_base
+    DBBaseModel = my_declarative_base
 
     JWT_SECRET: str = 'CHLaJbduWyzss9goxA3OngNuWnAIMpvoYwuG38_VKVs'
     """

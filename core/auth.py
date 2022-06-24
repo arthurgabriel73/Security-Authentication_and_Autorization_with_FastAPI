@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pytz import timezone
 
 from datetime import datetime, timedelta
@@ -19,10 +21,7 @@ oauth2_schema = OAuth2PasswordBearer(
 )
 
 
-async def authenticate(email: EmailStr,
-                       password: str,
-                       db: AsyncSession
-                       ) -> UserModel:  # Optional
+async def authenticate(email: EmailStr, password: str, db: AsyncSession) -> Optional[UserModel]:
     async with db as session:
         query = select(UserModel).filter(UserModel.email == email)
         result = await session.execute(query)
